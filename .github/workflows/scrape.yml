@@ -1,10 +1,9 @@
 name: Scrape Billboard Weekly
 
-# Run every Tuesday 10:00 UTC + manual trigger
 on:
   schedule:
-    - cron: '0 10 * * 2'
-  workflow_dispatch:
+    - cron: '0 10 * * 2' # Every Tuesday at 10:00 UTC
+  workflow_dispatch:      # Optional: manual run
 
 jobs:
   scrape:
@@ -13,6 +12,9 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+        with:
+          persist-credentials: true  # ⚡ Allow push
+          fetch-depth: 0            # Full history
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -34,4 +36,4 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add *.csv index.html
           git diff --cached --quiet || git commit -m "Update Billboard Hot 100 CSVs for $(date +'%Y-%m-%d')"
-          git push
+          git push origin main

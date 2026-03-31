@@ -1,0 +1,32 @@
+name: Scrape Billboard Weekly
+
+on:
+  schedule:
+    - cron: '0 10 * * 2' # Every Tuesday 10:00 UTC
+  workflow_dispatch: # Optional: run manually
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install requests beautifulsoup4 pandas
+
+      - name: Run Scraper
+        run: python scrape_billboard.py
+
+      - name: Commit CSV and HTML
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add *.csv index.html
+          git commit -m "Update Billboard Hot 100 CSVs for $(date +'%Y-%m-%d')" || echo "No changes"
+          git push
